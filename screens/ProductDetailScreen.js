@@ -1,24 +1,28 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../redux/cartSlice';
 
 export default function ProductDetailScreen({ route, navigation }) {
   const { product } = route.params;
+  const dispatch = useDispatch();
+
+  function handleAddToCart() {
+    dispatch(addToCart(product));
+    Alert.alert('Success', 'Product added to cart');
+  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.container}>
-        
         <Text style={styles.title}>Product Details</Text>
 
         <Image source={{ uri: product.image }} style={styles.image} />
 
         <Text style={styles.name}>{product.title}</Text>
-
         <Text style={styles.price}>${product.price}</Text>
-
         <Text style={styles.desc}>{product.description}</Text>
 
-        {/* Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.backBtn}
@@ -27,11 +31,13 @@ export default function ProductDetailScreen({ route, navigation }) {
             <Text style={styles.btnText}>Back</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.cartBtn}>
+          <TouchableOpacity
+            style={styles.cartBtn}
+            onPress={handleAddToCart}
+          >
             <Text style={styles.btnText}>Add to Cart</Text>
           </TouchableOpacity>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -41,6 +47,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: 10,
   },
   container: {
     padding: 20,
