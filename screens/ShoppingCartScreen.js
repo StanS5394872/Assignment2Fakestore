@@ -5,10 +5,17 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
-import { increaseQuantity, decreaseQuantity } from '../redux/cartSlice';
+
+import { createOrder } from '../redux/orderSlice';
+import {
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+} from '../redux/cartSlice';
 
 export default function ShoppingCartScreen() {
   const cartItems = useSelector((state) => state.cart.items);
@@ -19,6 +26,18 @@ export default function ShoppingCartScreen() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+function handleCheckout() {
+  if (cartItems.length === 0) {
+    Alert.alert('Error', 'Your shopping cart is empty');
+    return;
+  }
+
+  dispatch(createOrder(cartItems));
+  dispatch(clearCart());
+
+  Alert.alert('Success', 'Order created successfully');
+}
 
   function renderItem({ item }) {
     return (
@@ -69,7 +88,9 @@ export default function ShoppingCartScreen() {
                 Total Price: ${totalPrice.toFixed(2)}
               </Text>
             </View>
-
+            <TouchableOpacity style={styles.checkoutBtn} onPress={handleCheckout}>
+              <Text style={styles.checkoutText}>Check Out</Text>
+            </TouchableOpacity>
             <FlatList
               data={cartItems}
               keyExtractor={(item) => item.id.toString()}
@@ -159,5 +180,16 @@ const styles = StyleSheet.create({
   },
   quantity: {
     marginHorizontal: 10,
+  },
+  checkoutBtn: {
+  backgroundColor: '#2ecc71',
+  padding: 12,
+  borderRadius: 6,
+  marginBottom: 15,
+  alignItems: 'center',
+  },
+  checkoutText: {
+  color: '#fff',
+  fontWeight: 'bold',
   },
 });
